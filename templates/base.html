@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Магазин{% endblock %} — DiscZone</title>
+    <style>
+        :root { --bg:#0e1020; --card:#171a30; --line:#2a2f55; --text:#e8eaf6; --muted:#9aa0c3; --accent:#00e5a8; --accent2:#7c4dff; --danger:#ff5370; }
+        * { box-sizing: border-box; }
+        body { margin:0; background:var(--bg); color:var(--text); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; line-height:1.5; }
+        a { color:var(--accent); text-decoration:none; }
+        a:hover { text-decoration:underline; }
+        .topbar { display:flex; flex-wrap:wrap; align-items:center; gap:18px; padding:12px 24px; background:#080a18; border-bottom:2px solid var(--accent2); }
+        .logo { font-weight:800; font-size:1.3rem; letter-spacing:.5px; color:var(--text); }
+        .logo span { color:var(--accent); }
+        .topbar .spacer { flex:1; }
+        .topbar form { display:inline; margin:0; }
+        main { max-width:1100px; margin:0 auto; padding:24px; }
+        h2 { margin-top:0; }
+        button, .btn { background:var(--accent); color:#04130f; border:0; border-radius:6px; padding:8px 16px; font-weight:700; cursor:pointer; }
+        button:hover { filter:brightness(1.1); }
+        .topbar button { background:transparent; color:var(--muted); border:1px solid var(--line); font-weight:500; }
+        input, select, textarea { background:var(--card); color:var(--text); border:1px solid var(--line); border-radius:6px; padding:7px 10px; }
+        form p { margin:0 0 12px; }
+        form label { display:block; color:var(--muted); margin-bottom:3px; }
+        .helptext, .errorlist { color:var(--muted); font-size:.85rem; }
+        .errorlist { color:var(--danger); list-style:none; padding:0; margin:4px 0; }
+        .platforms { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:22px; }
+        .platforms a { padding:6px 14px; border:1px solid var(--line); border-radius:999px; color:var(--text); background:var(--card); }
+        .platforms a:hover { border-color:var(--accent); text-decoration:none; }
+        .platforms a.active { background:var(--accent2); border-color:var(--accent2); }
+        .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(210px,1fr)); gap:20px; }
+        .game-card { background:var(--card); border:1px solid var(--line); border-radius:10px; overflow:hidden; display:flex; flex-direction:column; }
+        .game-card:hover { border-color:var(--accent2); }
+        .game-card .cover { width:100%; aspect-ratio:3/4; object-fit:cover; background:linear-gradient(135deg,var(--accent2),#1b1e3a); display:flex; align-items:center; justify-content:center; font-size:3rem; }
+        .game-card .info { padding:14px; }
+        .game-card h3 { margin:0 0 4px; font-size:1.05rem; }
+        .game-card h3 a { color:var(--text); }
+        .tag { display:inline-block; font-size:.75rem; padding:2px 8px; border-radius:4px; background:var(--accent2); color:#fff; }
+        .price { color:var(--accent); font-weight:800; font-size:1.15rem; margin-top:8px; display:block; }
+        .covers { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:18px; }
+        .covers img { max-width:300px; border-radius:8px; border:1px solid var(--line); }
+        .muted { color:var(--muted); }
+        .instock { color:var(--accent); } .outstock { color:var(--danger); }
+        .cart-row { display:flex; flex-wrap:wrap; align-items:center; gap:12px; padding:12px 16px; background:var(--card); border:1px solid var(--line); border-radius:8px; margin-bottom:10px; }
+        .cart-row .remove { color:var(--danger); margin-left:auto; }
+        .total { font-size:1.4rem; }
+        .total b { color:var(--accent); }
+        .msg { padding:10px 14px; border-radius:6px; margin-bottom:14px; background:var(--card); border-left:4px solid var(--accent2); }
+        .msg-success { border-color:var(--accent); } .msg-error { border-color:var(--danger); }
+        .layout { display:grid; grid-template-columns:1fr 340px; gap:28px; } @media(max-width:800px){ .layout{grid-template-columns:1fr;} }
+        .panel { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px; }
+        table.t { width:100%; border-collapse:collapse; } table.t th, table.t td { padding:8px; border-bottom:1px solid var(--line); text-align:left; }
+        footer { text-align:center; color:var(--muted); padding:30px 0; font-size:.85rem; }
+    </style>
+</head>
+<body>
+    <nav class="topbar">
+        <a href="/" class="logo">🎮 Disc<span>Zone</span></a>
+        <a href="/">Каталог</a>
+        <span class="spacer"></span>
+        <a href="{% url 'shop:cart_detail' %}">🛒 Кошик ({{ cart|length }})</a>
+
+        {% if user.is_authenticated %}
+            <a href="{% url 'orders:order_list' %}">Мої замовлення</a>
+            <a href="{% url 'profile' %}">Профіль ({{ user.username }})</a>
+            <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit">Вийти</button>
+            </form>
+        {% else %}
+            <a href="{% url 'login' %}">Вхід</a>
+            <a href="{% url 'register' %}">Реєстрація</a>
+        {% endif %}
+    </nav>
+
+    <main>
+        {% if messages %}{% for message in messages %}
+            <div class="msg msg-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}{% endif %}
+        {% block content %}{% endblock %}
+    </main>
+    <footer>DiscZone — ігрові диски для PlayStation, Xbox та Nintendo Switch</footer>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Кошик{% endblock %}
+
+{% block content %}
+<h2>Ваш кошик</h2>
+{% if cart|length > 0 %}
+    {% for item in cart %}
+        <div class="cart-row">
+            <strong>{{ item.product.name }}</strong>
+            <span class="muted">{{ item.quantity }} шт. × {{ item.price }} ₴ =</span>
+            <b>{{ item.total_price }} ₴</b>
+            <a class="remove" href="{% url 'shop:cart_remove' item.product.id %}">Видалити</a>
+        </div>
+    {% endfor %}
+    <p class="total">Загальна сума: <b>{{ cart.get_total_price }} ₴</b></p>
+    <p><a class="btn" href="{% url 'orders:checkout' %}">Оформити замовлення</a></p>
+    <a href="{% url 'shop:product_list' %}">&larr; Продовжити вибір ігор</a>
+{% else %}
+    <p class="muted">Кошик порожній. <a href="{% url 'shop:product_list' %}">Обрати ігри</a></p>
+{% endif %}
+{% endblock %}

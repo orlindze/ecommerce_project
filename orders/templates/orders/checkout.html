@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Оформлення замовлення{% endblock %}
+{% block content %}
+<h2>Оформлення замовлення</h2>
+<div class="layout">
+    <div class="panel">
+        <h3 style="margin-top:0">Дані доставки</h3>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Підтвердити замовлення</button>
+        </form>
+    </div>
+    <div>
+        <div class="panel">
+            <h3 style="margin-top:0">Ваше замовлення</h3>
+            {% for item in cart %}
+                <p style="margin:4px 0">{{ item.product.name }} <span class="muted">× {{ item.quantity }}</span>
+                    <span style="float:right">{{ item.total_price }} ₴</span></p>
+            {% endfor %}
+            <hr style="border-color:var(--line)">
+            <p>Сума: <span style="float:right">{{ subtotal }} ₴</span></p>
+            {% if coupon %}
+                <p>Знижка {{ coupon.discount_percent }}% ({{ coupon.code }}):
+                    <span style="float:right;color:var(--accent)">− {{ discount }} ₴</span></p>
+            {% endif %}
+            <p class="total">Разом: <b style="float:right">{{ total }} ₴</b></p>
+        </div>
+        <div class="panel" style="margin-top:16px">
+            {% if coupon %}
+                <form action="{% url 'orders:coupon_remove' %}" method="post">
+                    {% csrf_token %}
+                    Промокод <b>{{ coupon.code }}</b> застосовано
+                    <button type="submit" style="margin-left:8px">Прибрати</button>
+                </form>
+            {% else %}
+                <form action="{% url 'orders:coupon_apply' %}" method="post">
+                    {% csrf_token %}
+                    {{ coupon_form.code }}
+                    <button type="submit">Застосувати</button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

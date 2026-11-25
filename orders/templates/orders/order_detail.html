@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Замовлення №{{ order.pk }}{% endblock %}
+{% block content %}
+<h2>Замовлення №{{ order.pk }} <span class="tag">{{ order.get_status_display }}</span></h2>
+<p class="muted">від {{ order.created_at|date:"d.m.Y H:i" }} · {{ order.email }}</p>
+
+<table class="t">
+    <tr><th>Гра</th><th>Ціна</th><th>К-сть</th><th>Сума</th></tr>
+    {% for item in order.items.all %}
+        <tr><td>{{ item.product_name }}</td><td>{{ item.price }} ₴</td><td>{{ item.quantity }}</td><td>{{ item.get_cost }} ₴</td></tr>
+    {% endfor %}
+</table>
+<p>Сума: {{ order.get_subtotal }} ₴</p>
+{% if order.discount_percent %}
+    <p>Знижка {{ order.discount_percent }}%{% if order.coupon %} ({{ order.coupon.code }}){% endif %}: − {{ order.get_discount }} ₴</p>
+{% endif %}
+<p class="total">Разом: <b>{{ order.get_total }} ₴</b></p>
+
+{% with a=order.shipping_address %}
+<div class="panel">
+    <h3 style="margin-top:0">Доставка</h3>
+    <p style="margin:0">{{ a.full_name }}, {{ a.phone }}<br>{{ a.country }}, {{ a.city }}, {{ a.address }} {{ a.postal_code }}</p>
+</div>
+{% endwith %}
+<p><a class="btn" href="{% url 'orders:order_invoice' order.pk %}">Завантажити рахунок (PDF)</a></p>
+{% endblock %}

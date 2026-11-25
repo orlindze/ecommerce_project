@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Мої замовлення{% endblock %}
+{% block content %}
+<h2>Мої замовлення</h2>
+{% for order in orders %}
+    <div class="cart-row">
+        <a href="{{ order.get_absolute_url }}"><b>Замовлення №{{ order.pk }}</b></a>
+        <span class="muted">{{ order.created_at|date:"d.m.Y" }}</span>
+        <span class="tag">{{ order.get_status_display }}</span>
+        <b style="margin-left:auto">{{ order.get_total }} ₴</b>
+    </div>
+{% empty %}
+    <p class="muted">Замовлень поки немає.</p>
+{% endfor %}
+{% endblock %}
